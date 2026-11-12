@@ -1,0 +1,324 @@
+/* ─── Interactive Hover List Features Section (Awake Agency Style) ─── */
+.fhl-section {
+  position: relative;
+  width: 100%;
+  padding: 80px 24px 100px;
+  background: #FAF8F5;
+  overflow: hidden;
+}
+
+.fhl-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.fhl-header {
+  margin-bottom: 48px;
+  text-align: left;
+}
+
+.fhl-kicker {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #166534;
+  margin-bottom: 12px;
+}
+
+.fhl-title {
+  font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #171923;
+  margin: 0 0 14px 0;
+}
+
+.fhl-title em {
+  font-style: italic;
+  font-family: inherit;
+  color: #166534;
+}
+
+.fhl-subtitle {
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
+  color: #525252;
+  font-weight: 400;
+  max-width: 580px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ─── Layout: Full-width list with floating mockup overlay ─── */
+.fhl-stage {
+  position: relative;
+  width: 100%;
+  min-height: 600px;
+}
+
+.fhl-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.fhl-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 14px;
+}
+
+.fhl-item-left {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+}
+
+.fhl-item-num {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #94A3B8;
+  transition: color 0.3s ease;
+}
+
+.fhl-item-name {
+  font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #94A3B8;
+  opacity: 0.45;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fhl-item-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.fhl-item-desc {
+  font-size: 0.875rem;
+  color: #737373;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  text-align: right;
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fhl-item-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.04);
+  color: #94A3B8;
+  transition: all 0.3s ease;
+}
+
+.fhl-item-arrow {
+  font-size: 1.25rem;
+  color: #94A3B8;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Active State */
+.fhl-item.active {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+}
+
+.fhl-item.active .fhl-item-num {
+  color: #166534;
+}
+
+.fhl-item.active .fhl-item-name {
+  color: #171923;
+  opacity: 1;
+  font-weight: 700;
+  transform: translateX(4px);
+}
+
+.fhl-item.active .fhl-item-desc {
+  color: #525252;
+  opacity: 1;
+}
+
+.fhl-item.active .fhl-item-tag {
+  background: rgba(22, 101, 52, 0.1);
+  color: #166534;
+}
+
+.fhl-item.active .fhl-item-arrow {
+  opacity: 1;
+  transform: translateX(0);
+  color: #166534;
+}
+
+/* ─── Floating Mockup Card (Centered in viewport / stage) ─── */
+.fhl-floating-card-wrapper {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 420px;
+  max-width: 90vw;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.fhl-card {
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: 24px;
+  border: 1px solid rgba(22, 101, 52, 0.25);
+  box-shadow:
+    0 30px 60px -15px rgba(0, 0, 0, 0.22),
+    0 0 35px -5px rgba(22, 101, 52, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.3s ease;
+}
+
+.fhl-card-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #F8FAF8;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.fhl-card-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #166534;
+  text-transform: uppercase;
+}
+
+.fhl-card-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #166534;
+  box-shadow: 0 0 8px #166534;
+}
+
+.fhl-card-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748B;
+  background: #FFFFFF;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.fhl-card-content {
+  padding: 16px 20px 20px;
+}
+
+.fhl-card-svg-container {
+  width: 100%;
+  height: 220px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #F9FAFB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.fhl-card-svg-container svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fhl-card-footer {
+  margin-top: 14px;
+}
+
+.fhl-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #171923;
+  margin: 0 0 6px 0;
+}
+
+.fhl-card-text {
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* ─── Responsive Adjustments ─── */
+@media (max-width: 1024px) {
+  .fhl-item-desc {
+    display: none;
+  }
+
+  .fhl-floating-card-wrapper {
+    width: 360px;
+  }
+}
+
+@media (max-width: 768px) {
+  .fhl-section {
+    padding: 60px 16px 80px;
+  }
+
+  .fhl-stage {
+    min-height: auto;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 32px;
+  }
+
+  .fhl-floating-card-wrapper {
+    position: static;
+    transform: none;
+    width: 100%;
+    margin-bottom: 24px;
+    pointer-events: auto;
+  }
+
+  .fhl-item {
+    padding: 16px 12px;
+  }
+
+  .fhl-item-name {
+    font-size: 1.15rem;
+  }
+}

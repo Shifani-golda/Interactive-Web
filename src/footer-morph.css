@@ -1,0 +1,230 @@
+/* ─── Cursor Proximity & Typography Morph Footer (Yevgeniya Grab / Agency Style) ─── */
+.fm-section {
+  position: relative;
+  width: 100%;
+  background: #FAF8F5;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 100px 24px 44px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+.fm-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  will-change: transform, opacity;
+}
+
+/* Top Call To Action */
+.fm-cta-block {
+  text-align: center;
+  margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+}
+
+.fm-headline {
+  font-size: clamp(3rem, 6.5vw, 5.2rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: #171923;
+  margin: 0 0 16px 0;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fm-headline span {
+  color: #166534;
+}
+
+.fm-subheadline {
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
+  color: #525252;
+  margin: 0 0 28px 0;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.65;
+}
+
+/* Primary Button with Animated Arrow */
+.fm-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #171923;
+  color: #FFFFFF;
+  padding: 14px 28px;
+  border-radius: 9999px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18), 0 0 20px -5px rgba(22, 101, 52, 0.25);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fm-btn-primary:hover {
+  background: #166534;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px -8px rgba(22, 101, 52, 0.35);
+}
+
+.fm-btn-arrow {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fm-btn-primary:hover .fm-btn-arrow {
+  transform: translateX(4px);
+}
+
+/* Central Brand Title: 'Easy Kanaku' in Clean Sans-Serif Bold */
+.fm-brand-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 0 70px;
+  padding: 20px 0;
+  cursor: default;
+  user-select: none;
+}
+
+.fm-brand-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(2px, 0.8vw, 8px);
+  font-family: inherit;
+  font-size: clamp(3.2rem, 8.5vw, 7.8rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #171923;
+  line-height: 1.05;
+  text-transform: none;
+  /* Title Case 'Easy Kanaku' */
+}
+
+.fm-letter {
+  display: inline-block;
+  will-change: transform, filter, opacity, letter-spacing;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.35s ease,
+    color 0.25s ease;
+}
+
+.fm-letter.space {
+  width: clamp(12px, 2.5vw, 28px);
+}
+
+.fm-letter:hover {
+  color: #166534;
+}
+
+/* Line-Sweep Nav Links */
+.fm-links-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 4vw, 48px);
+  margin-bottom: 50px;
+  flex-wrap: wrap;
+}
+
+.line-sweep-link {
+  position: relative;
+  color: #475569;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding-bottom: 6px;
+  transition: color 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
+  will-change: filter, opacity;
+}
+
+.line-sweep-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #166534;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.line-sweep-link:hover {
+  color: #171923;
+}
+
+.line-sweep-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Bottom Copyright Bar */
+.fm-bottom-bar {
+  width: 100%;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #94A3B8;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.fm-bottom-bar a {
+  color: #94A3B8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.fm-bottom-bar a:hover {
+  color: #166534;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .fm-section {
+    padding: 70px 16px 30px;
+  }
+
+  .fm-cta-block {
+    margin-bottom: 36px;
+  }
+
+  .fm-brand-wrap {
+    margin: 16px 0 44px;
+  }
+
+  .fm-links-nav {
+    gap: 20px;
+    margin-bottom: 35px;
+  }
+
+  .fm-bottom-bar {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+  }
+}

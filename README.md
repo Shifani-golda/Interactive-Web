@@ -1,4 +1,4 @@
-# Easy Kanakku — Interactive 2026 Redesign
+# Easy Kanaku — Interactive 2026 Redesign
 
 A responsive React + Vite landing page and browser-only product demo built from the design brief in the supplied conversation.
 
