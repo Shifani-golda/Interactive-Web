@@ -75,6 +75,8 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18), 0 0 20px -5px rgba(22, 101, 52, 0.25);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .fm-btn-primary:hover {
@@ -100,8 +102,15 @@
   align-items: center;
   margin: 30px 0 70px;
   padding: 20px 0;
-  cursor: default;
+  cursor: pointer;
   user-select: none;
+}
+
+/* Remove blur across the entire wordmark whenever hovering anywhere on the wrapper or any letter */
+.fm-brand-wrap:hover .fm-brand-title,
+.fm-brand-title:hover {
+  filter: blur(0px) !important;
+  opacity: 1 !important;
 }
 
 .fm-brand-title {
@@ -113,28 +122,35 @@
   font-size: clamp(3.2rem, 8.5vw, 7.8rem);
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #171923;
+  color: #1E293B;
   line-height: 1.05;
   text-transform: none;
-  /* Title Case 'Easy Kanaku' */
 }
 
+/* Individual letter: defaults to dark charcoal/slate (#1E293B) */
 .fm-letter {
   display: inline-block;
-  will-change: transform, filter, opacity, letter-spacing;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-    filter 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.35s ease,
-    color 0.25s ease;
+  color: #1E293B;
+  cursor: pointer;
+  will-change: transform, filter, opacity, letter-spacing, color;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.25s ease,
+    color 0.2s ease;
 }
 
 .fm-letter.space {
   width: clamp(12px, 2.5vw, 28px);
+  cursor: default;
 }
 
-.fm-letter:hover {
-  color: #166534;
+/* ONLY the single letter directly under the user's cursor transitions to forest green (#15803D) */
+.fm-letter:not(.space):hover {
+  color: #15803D !important;
+  transform: translateY(-2px);
 }
+
+
 
 /* Line-Sweep Nav Links */
 .fm-links-nav {
@@ -188,7 +204,8 @@
   align-items: center;
   justify-content: space-between;
   font-size: 0.85rem;
-  color: #94A3B8;
+  font-weight: 500;
+  color: #475569;
   flex-wrap: wrap;
   gap: 16px;
 }

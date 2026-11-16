@@ -25,11 +25,25 @@ function HeroSection() {
   const cardRef = useRef(null);
   const voiceTextRef = useRef(null);
   const entryTextRef = useRef(null);
+  const textareaRef = useRef(null);
 
   const [heroRecording, setHeroRecording] = useState(false);
   const [heroTranscript, setHeroTranscript] = useState('');
   const [heroSubmitted, setHeroSubmitted] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [savedText, setSavedText] = useState('');
   const heroRecognitionRef = useRef(null);
+
+  /* ESC key dismiss for confirmation modal */
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setShowModal(false);
+    };
+    if (showModal) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showModal]);
 
   /* GSAP scroll-pin + parallax effect */
   useEffect(() => {
@@ -98,7 +112,9 @@ function HeroSection() {
 
   function handleHeroSubmit() {
     if (!heroTranscript.trim()) return;
+    setSavedText(heroTranscript);
     setHeroSubmitted(true);
+    setShowModal(true);
     setTimeout(() => setHeroSubmitted(false), 2800);
   }
 
@@ -146,6 +162,7 @@ function HeroSection() {
         {/* Transcript text box */}
         <div className="hvc-transcript-wrap">
           <textarea
+            ref={textareaRef}
             className="hvc-transcript"
             value={heroTranscript}
             onChange={e => setHeroTranscript(e.target.value)}
@@ -187,6 +204,101 @@ function HeroSection() {
           <span>Services</span><span>Small businesses</span>
         </div>
       </div>
+
+      {/* Clean, Witty Confirmation Popup Modal */}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            className="ek-modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            onClick={() => setShowModal(false)}
+          >
+            <motion.div
+              className="ek-modal-card"
+              initial={{ scale: 0.92, opacity: 0, y: 16 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 16 }}
+              transition={{ type: "spring", stiffness: 350, damping: 26 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className="ek-modal-close"
+                onClick={() => setShowModal(false)}
+                aria-label="Close modal"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="ek-modal-pill">
+                <Check size={14} />
+                <span>ENTRY LOGGED</span>
+              </div>
+
+              <h3 className="ek-modal-title">
+                Done. Your entry is saved in the app.
+              </h3>
+
+              <div className="ek-modal-receipt">
+                <span className="ek-modal-receipt-label">Saved to your ledger:</span>
+                <p className="ek-modal-receipt-text">“{savedText || heroTranscript || 'Received ₹2,400 from Ravi'}”</p>
+              </div>
+
+              <p className="ek-modal-subtext">
+                Download Easy Kanaku to view it in your ledger.
+              </p>
+
+              <div className="ek-modal-store-grid">
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.reflexlabs.easykanakku"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ek-modal-store-btn"
+                >
+                  <svg className="ek-store-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                    <path d="M3.609 1.814L13.793 12 3.61 22.186c-.347-.365-.549-.876-.549-1.45V3.264c0-.574.202-1.085.548-1.45zm11.242 11.243l2.091 2.091-11.834 6.84 9.743-8.931zm0-2.114L5.108 1.996l11.834 6.84-2.091 2.091zm1.472 1.057l3.664 2.118c.954.551.954 1.455 0 2.006l-3.664 2.118-2.355-2.355 2.355-1.887z"/>
+                  </svg>
+                  <div>
+                    <span className="ek-store-label">GET IT ON</span>
+                    <span className="ek-store-name">Google Play</span>
+                  </div>
+                </a>
+                <a
+                  href="https://apps.apple.com/in/app/easy-kanaku/id6815802230"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ek-modal-store-btn"
+                >
+                  <svg className="ek-store-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.63 1.35-.57.65-1.06 1.73-.93 2.76 1.01.08 2.02-.51 2.64-1.26z"/>
+                  </svg>
+                  <div>
+                    <span className="ek-store-label">DOWNLOAD ON</span>
+                    <span className="ek-store-name">App Store</span>
+                  </div>
+                </a>
+              </div>
+
+              <div style={{ textAlign: "center", marginTop: "12px" }}>
+                <button
+                  type="button"
+                  className="ek-modal-btn-secondary"
+                  onClick={() => {
+                    setShowModal(false);
+                    setHeroTranscript('');
+                    setHeroSubmitted(false);
+                    setTimeout(() => textareaRef.current?.focus(), 150);
+                  }}
+                >
+                  Try another entry
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
@@ -229,7 +341,7 @@ const featuresData = [
   {
     id: "02",
     num: "02",
-    title: "Udhaar (Credit) Tracking",
+    title: "Credit Tracking",
     sub: "Who owes you, whom you owe",
     tag: "Credit Ledger",
     desc: "Track customer balances, send overdue reminders, record partial payments, and keep every promise in one place.",
@@ -729,7 +841,7 @@ function RemindersMockupSVG() {
         <rect x="16" y="14" width="8" height="8" rx="4" fill="#EAB308" />
         <text x="32" y="22" fill="#64748B" fontSize="10" fontWeight="700" letterSpacing="0.05em" fontFamily="sans-serif">EASY KANAKU REMINDER</text>
         <text x="16" y="46" fill="#1E293B" fontSize="12" fontWeight="700" fontFamily="sans-serif">
-          Ready to wrap up today? 2 Udhaar follow-ups pending.
+          Ready to wrap up today? 2 Credit follow-ups pending.
         </text>
         <rect x="16" y="58" width="135" height="26" rx="6" fill="#166534" />
         <text x="83" y="75" fill="#FFFFFF" fontSize="10" fontWeight="700" textAnchor="middle" fontFamily="sans-serif">Close Day Book Now</text>
@@ -739,6 +851,17 @@ function RemindersMockupSVG() {
     </svg>
   );
 }
+
+const featureScreenshots = [
+  "/images/MicPopup_reference.png",       // #1 Voice in 5 languages
+  "/images/CreditCollect_reference.png",  // #2 Credit Tracking
+  "/images/HomeDefault_reference.png",    // #3 Smart Dashboard
+  "/images/ReportsPie_reference.png",     // #4 Reports & Analytics
+  "/images/EntryDetail_reference.png",    // #5 Bill Attachments
+  "/images/Account_reference.png",        // #6 Multi-Business
+  "/images/DayBook_reference.png",        // #7 Day Book
+  "/images/ReviewDays_reference.png",     // #8 Daily Reminders
+];
 
 const featureMockupComponents = [
   VoiceMockupSVG,
@@ -754,7 +877,6 @@ const featureMockupComponents = [
 /* ─── Interactive Hover List Features Section (Awake Agency Style) ─── */
 function InteractiveHoverFeatures() {
   const [activeIdx, setActiveIdx] = useState(0);
-  const ActiveSVG = featureMockupComponents[activeIdx] || VoiceMockupSVG;
   const currentFeature = featuresData[activeIdx];
 
   // Target Y offset for floating mockup card:
@@ -827,7 +949,16 @@ function InteractiveHoverFeatures() {
                       transition={{ duration: 0.28, ease: "easeOut" }}
                       style={{ width: "100%", height: "100%" }}
                     >
-                      <ActiveSVG />
+                      <div className="fhl-device-wrapper">
+                        <div className={`fhl-device-frame ${featureScreenshots[activeIdx].includes('MicPopup') ? 'align-bottom' : ''}`}>
+                          <img
+                            src={featureScreenshots[activeIdx]}
+                            alt={currentFeature.title}
+                            className={`fhl-device-img ${featureScreenshots[activeIdx].includes('MicPopup') ? 'align-bottom' : ''}`}
+                          />
+                          <div className={featureScreenshots[activeIdx].includes('MicPopup') ? 'fhl-device-fade-top' : 'fhl-device-fade'} />
+                        </div>
+                      </div>
                     </motion.div>
                   </AnimatePresence>
                 </div>
@@ -1019,20 +1150,14 @@ function CardStack3DSection() {
                 </p>
               </div>
 
-              <div className="cs-card-visual">
-                <div className="cs-entry-pill">
-                  <div className="cs-entry-pill-left">
-                    <span className="cs-entry-icon">✓</span>
-                    <div>
-                      <div className="cs-entry-name">Ravi Kumar</div>
-                      <div style={{ fontSize: "0.72rem", color: "#64748B" }}>Shop supplies</div>
-                    </div>
-                  </div>
-                  <span className="cs-entry-amt">+₹2,400</span>
-                </div>
-                <div className="cs-confirm-bar">
-                  <span>AI Interpretation</span>
-                  <span className="cs-confirm-badge">Ready to log</span>
+              <div className="cs-card-visual cs-card-visual-device">
+                <div className="cs-device-frame">
+                  <img
+                    src="/images/CheckSave_reference.png"
+                    alt="Clear Entries Screenshot"
+                    className="cs-device-img"
+                  />
+                  <div className="cs-device-fade" />
                 </div>
               </div>
             </motion.div>
@@ -1054,20 +1179,14 @@ function CardStack3DSection() {
                 </p>
               </div>
 
-              <div className="cs-card-visual">
-                <div className="cs-ledger-metrics">
-                  <div className="cs-metric-box">
-                    <div className="cs-metric-label">Income</div>
-                    <div className="cs-metric-val green">₹24,800</div>
-                  </div>
-                  <div className="cs-metric-box">
-                    <div className="cs-metric-label">Credit Due</div>
-                    <div className="cs-metric-val amber">₹3,450</div>
-                  </div>
-                </div>
-                <div className="cs-ledger-tag">
-                  <span className="live-dot" />
-                  <span>Real-time balance synchronization</span>
+              <div className="cs-card-visual cs-card-visual-device">
+                <div className="cs-device-frame">
+                  <img
+                    src="/images/CreditCollect_reference.png"
+                    alt="Unified Ledger Screenshot"
+                    className="cs-device-img"
+                  />
+                  <div className="cs-device-fade" />
                 </div>
               </div>
             </motion.div>
@@ -1089,19 +1208,14 @@ function CardStack3DSection() {
                 </p>
               </div>
 
-              <div className="cs-card-visual">
-                <div className="cs-file-box">
-                  <div className="cs-file-icon">
-                    <Download size={18} />
-                  </div>
-                  <div className="cs-file-details">
-                    <div className="cs-file-name">ledger-oct-2026.csv</div>
-                    <div className="cs-file-size">Formatted for CA & Tax review</div>
-                  </div>
-                </div>
-                <div className="cs-file-status">
-                  <span>Reconciled & Audit-Ready</span>
-                  <span style={{ color: "#166534", fontWeight: 700 }}>100% Valid</span>
+              <div className="cs-card-visual cs-card-visual-device">
+                <div className="cs-device-frame">
+                  <img
+                    src="/images/Reports_reference.png"
+                    alt="Export Ready Screenshot"
+                    className="cs-device-img"
+                  />
+                  <div className="cs-device-fade" />
                 </div>
               </div>
             </motion.div>
@@ -1112,7 +1226,7 @@ function CardStack3DSection() {
   );
 }
 /* ─── Cursor Proximity & Typography Morph Footer (Yevgeniya Grab / Agency Style) ─── */
-function FooterMorphSection() {
+function FooterMorphSection({ onOpenDemo }) {
   const footerRef = useRef(null);
   const containerRef = useRef(null);
   const brandRef = useRef(null);
@@ -1122,6 +1236,7 @@ function FooterMorphSection() {
   const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
   const [isHovered, setIsHovered] = useState(false);
   const [brandDist, setBrandDist] = useState(9999);
+  const [isBrandHovered, setIsBrandHovered] = useState(false);
 
   // 'Easy Kanaku' in Title Case with clean sans-serif typography
   const brandLetters = [
@@ -1211,6 +1326,15 @@ function FooterMorphSection() {
   // Baseline (cursor away): subtle low blur (1.8px), opacity 0.88 -> clearly readable!
   // Within 200px: smooth transition to 0px blur, full opacity, subtle tracking & scale expansion.
   const getBrandTitleStyle = () => {
+    if (isBrandHovered) {
+      return {
+        filter: 'blur(0px)',
+        opacity: 1,
+        letterSpacing: '-0.01em',
+        transform: 'scale(1.025)',
+        transition: 'filter 0.15s ease, opacity 0.15s ease, transform 0.15s ease',
+      };
+    }
     if (!isHovered || brandDist > 200) {
       return {
         filter: 'blur(1.8px)',
@@ -1255,16 +1379,63 @@ function FooterMorphSection() {
           <p className="fm-subheadline">
             Bookkeeping made effortless.
           </p>
-          <a className="fm-btn-primary" href="#demo">
+          <button
+            type="button"
+            className="fm-btn-primary"
+            onClick={(e) => {
+              if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+              onOpenDemo?.();
+            }}
+          >
             <span>Try Demo</span>
             <ArrowRight className="fm-btn-arrow" size={16} />
-          </a>
+          </button>
+          <div className="fm-store-buttons">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.reflexlabs.easykanakku"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="fm-store-badge"
+              aria-label="Get Easy Kanaku on Google Play"
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                <path fill="#2196F3" d="M3.609 1.814L13.793 12 3.61 22.186c-.347-.365-.549-.876-.549-1.45V3.264c0-.574.202-1.085.548-1.45z"/>
+                <path fill="#4CAF50" d="M3.61 22.186l11.241-10.186 2.284 2.093-11.834 6.84c-.58.336-1.23.013-1.691-.747z"/>
+                <path fill="#F44336" d="M3.609 1.814c.461-.76 1.111-1.083 1.691-.747l11.834 6.84-2.284 2.093L3.609 1.814z"/>
+                <path fill="#FFC107" d="M17.135 14.093l-2.284-2.093 2.284-2.093 2.585 1.492c.738.426.738 1.768 0 2.194l-2.585 1.5z"/>
+              </svg>
+              <div className="fm-store-badge-text">
+                <span className="fm-store-badge-sub">GET IT ON</span>
+                <span className="fm-store-badge-title">Google Play</span>
+              </div>
+            </a>
+            <a
+              href="https://apps.apple.com/in/app/easy-kanaku/id6815802230"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="fm-store-badge"
+              aria-label="Download Easy Kanaku on the App Store"
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="#FFFFFF" aria-hidden="true">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.63 1.35-.57.65-1.06 1.73-.93 2.76 1.01.08 2.02-.51 2.64-1.26z"/>
+              </svg>
+              <div className="fm-store-badge-text">
+                <span className="fm-store-badge-sub">Download on the</span>
+                <span className="fm-store-badge-title">App Store</span>
+              </div>
+            </a>
+          </div>
         </div>
 
         {/* Central Brand Title: 'Easy Kanaku' in Title Case Sans-Serif */}
         <div
           className="fm-brand-wrap"
           ref={brandRef}
+          onMouseEnter={() => setIsBrandHovered(true)}
+          onMouseLeave={() => setIsBrandHovered(false)}
         >
           <div
             className="fm-brand-title"
@@ -1399,6 +1570,411 @@ function HeroIntroPreloader({ onStartReveal, onComplete }) {
   );
 }
 
+const previewTabsData = {
+  'Dashboard': {
+    title: 'Good morning, Priya 👋',
+    img: '/images/HomeDefault_reference.png',
+    alt: 'Easy Kanaku Dashboard View',
+  },
+  'Voice Entry': {
+    title: 'Voice entry',
+    img: '/images/MicPopup_reference.png',
+    alt: 'Easy Kanaku Voice Entry View',
+  },
+  'Credit Ledger': {
+    title: 'Customer credit',
+    img: '/images/CreditCollect_reference.png',
+    alt: 'Easy Kanaku Credit Ledger View',
+  },
+  'Reports': {
+    title: 'Business reports',
+    img: '/images/Reports_reference.png',
+    alt: 'Easy Kanaku Reports View',
+  },
+};
+
+/* ─── Clean, Theme-Matched "Live Demo Coming Soon" Modal ─── */
+function DemoComingSoonModal({ isOpen, onClose }) {
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="dcs-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.22 }}
+          onClick={onClose}
+        >
+          <motion.div
+            className="dcs-card"
+            initial={{ scale: 0.92, opacity: 0, y: 16 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.92, opacity: 0, y: 16 }}
+            transition={{ type: "spring", stiffness: 350, damping: 26 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="dcs-close"
+              onClick={onClose}
+              aria-label="Close modal"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="dcs-pill">
+              <Sparkles size={12} />
+              <span>LIVE DEMO</span>
+            </div>
+
+            <h3 className="dcs-title">
+              Interactive demo is launching soon.
+            </h3>
+
+            <p className="dcs-subtext">
+              We're putting the finishing touches on the web demo. Meanwhile, download Easy Kanaku to experience voice bookkeeping right on your phone.
+            </p>
+
+            <div className="dcs-store-grid">
+              <a
+                href="https://play.google.com/store/apps/details?id=com.reflexlabs.easykanakku"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="dcs-store-btn"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                  <path d="M3.609 1.814L13.793 12 3.61 22.186c-.347-.365-.549-.876-.549-1.45V3.264c0-.574.202-1.085.548-1.45zm11.242 11.243l2.091 2.091-11.834 6.84 9.743-8.931zm0-2.114L5.108 1.996l11.834 6.84-2.091 2.091zm1.472 1.057l3.664 2.118c.954.551.954 1.455 0 2.006l-3.664 2.118-2.355-2.355 2.355-1.887z"/>
+                </svg>
+                <span>Google Play</span>
+              </a>
+              <a
+                href="https://apps.apple.com/in/app/easy-kanaku/id6815802230"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="dcs-store-btn"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.63 1.35-.57.65-1.06 1.73-.93 2.76 1.01.08 2.02-.51 2.64-1.26z"/>
+                </svg>
+                <span>App Store</span>
+              </a>
+            </div>
+
+            <div className="dcs-dismiss-wrap">
+              <button
+                type="button"
+                className="dcs-dismiss"
+                onClick={onClose}
+              >
+                Back to page
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+
+/* ─── Fanned Card Deck – Everyday Struggle Section ─── */
+const PAIN_CARDS = [
+  {
+    id: 1,
+    title: 'Too much typing',
+    tagline: 'EVERY SMALL SALE SHOULDN\'T MEAN A LONG FORM',
+    solution: 'Just speak. Easy Kanaku captures your sale with a single voice command—no form, no keyboard, no delay.',
+    gradient: 'linear-gradient(145deg, #E0F2E9 0%, #EAF5EE 55%, #F7F6F0 100%)',
+    accent: '#15803D',
+    icon: (
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="12" y="22" width="56" height="36" rx="8" stroke="#15803D" strokeWidth="1.5" fill="none" opacity="0.18"/>
+        <line x1="22" y1="34" x2="58" y2="34" stroke="#15803D" strokeWidth="1.5" strokeLinecap="round" opacity="0.3"/>
+        <line x1="22" y1="42" x2="50" y2="42" stroke="#15803D" strokeWidth="1.5" strokeLinecap="round" opacity="0.3"/>
+        <line x1="22" y1="50" x2="44" y2="50" stroke="#15803D" strokeWidth="1.5" strokeLinecap="round" opacity="0.3"/>
+        <circle cx="58" cy="52" r="10" fill="#EAF5EE" stroke="#15803D" strokeWidth="1.5" opacity="0.5"/>
+        <path d="M54 52l3 3 5-5" stroke="#15803D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.6"/>
+      </svg>
+    ),
+    rotate: -15,
+    tx: -190,
+    ty: 28,
+    zIndex: 1,
+  },
+  {
+    id: 2,
+    title: 'Complicated entries',
+    tagline: 'KEEP YOUR BOOKS CLEAR WITHOUT THE JARGON',
+    solution: 'No accounting degree needed. Say "received ₹500 from Ravi" and your ledger is updated instantly.',
+    gradient: 'linear-gradient(145deg, #F7F6F0 0%, #EAF5EE 60%, #E0F2E9 100%)',
+    accent: '#166534',
+    icon: (
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="16" y="14" width="34" height="44" rx="6" stroke="#15803D" strokeWidth="1.5" fill="none" opacity="0.2"/>
+        <line x1="22" y1="26" x2="44" y2="26" stroke="#15803D" strokeWidth="1.3" strokeLinecap="round" opacity="0.35"/>
+        <line x1="22" y1="34" x2="40" y2="34" stroke="#15803D" strokeWidth="1.3" strokeLinecap="round" opacity="0.35"/>
+        <line x1="22" y1="42" x2="38" y2="42" stroke="#15803D" strokeWidth="1.3" strokeLinecap="round" opacity="0.35"/>
+        <circle cx="52" cy="50" r="12" fill="#EDF7F2" stroke="#15803D" strokeWidth="1.5" opacity="0.5"/>
+        <path d="M47 50h10M52 45v10" stroke="#15803D" strokeWidth="1.5" strokeLinecap="round" opacity="0.65"/>
+      </svg>
+    ),
+    rotate: -9,
+    tx: -114,
+    ty: 12,
+    zIndex: 2,
+  },
+  {
+    id: 3,
+    title: 'Language barriers',
+    tagline: 'SPEAK IN TAMIL, HINDI, ENGLISH, TELUGU OR KANNADA',
+    solution: 'Your business speaks your language. Record entries in whichever language feels natural to you.',
+    gradient: 'linear-gradient(145deg, #EDF7F2 0%, #E0F2E9 50%, #FEF9EC 100%)',
+    accent: '#15803D',
+    icon: (
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="40" cy="40" r="22" stroke="#15803D" strokeWidth="1.5" fill="none" opacity="0.18"/>
+        <ellipse cx="40" cy="40" rx="10" ry="22" stroke="#15803D" strokeWidth="1.3" fill="none" opacity="0.22"/>
+        <line x1="18" y1="33" x2="62" y2="33" stroke="#15803D" strokeWidth="1.3" strokeLinecap="round" opacity="0.28"/>
+        <line x1="18" y1="47" x2="62" y2="47" stroke="#15803D" strokeWidth="1.3" strokeLinecap="round" opacity="0.28"/>
+        <text x="30" y="44" fontSize="11" fontFamily="sans-serif" fill="#15803D" opacity="0.4" fontWeight="600">அ</text>
+      </svg>
+    ),
+    rotate: -3,
+    tx: -38,
+    ty: 2,
+    zIndex: 3,
+  },
+  {
+    id: 4,
+    title: 'Forgotten credit',
+    tagline: 'TRACK EVERY RUPEE TO COLLECT AND PAY',
+    solution: 'Never lose track of who owes you. Easy Kanaku logs every credit sale and reminds you to collect.',
+    gradient: 'linear-gradient(145deg, #FEF9EC 0%, #F7F6F0 55%, #EAF5EE 100%)',
+    accent: '#166534',
+    icon: (
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="40" cy="34" r="14" stroke="#15803D" strokeWidth="1.5" fill="none" opacity="0.2"/>
+        <text x="34" y="39" fontSize="14" fontFamily="sans-serif" fill="#15803D" opacity="0.4" fontWeight="700">₹</text>
+        <path d="M28 56 Q40 48 52 56" stroke="#15803D" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.3"/>
+        <circle cx="58" cy="22" r="7" fill="#FEF9EC" stroke="#CA8A04" strokeWidth="1.3" opacity="0.5"/>
+        <text x="55" y="27" fontSize="9" fontFamily="sans-serif" fill="#CA8A04" opacity="0.7" fontWeight="700">!</text>
+      </svg>
+    ),
+    rotate: 3,
+    tx: 38,
+    ty: 2,
+    zIndex: 4,
+  },
+  {
+    id: 5,
+    title: 'End-of-day math',
+    tagline: 'INSTANT CASH & BANK DAY BOOK TOTALS',
+    solution: 'Your day book closes itself. Cash, bank, credit—everything summed and ready before you lock up.',
+    gradient: 'linear-gradient(145deg, #EAF5EE 0%, #E0F2E9 50%, #EDF7F2 100%)',
+    accent: '#15803D',
+    icon: (
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="16" y="20" width="48" height="40" rx="7" stroke="#15803D" strokeWidth="1.5" fill="none" opacity="0.18"/>
+        <line x1="16" y1="34" x2="64" y2="34" stroke="#15803D" strokeWidth="1.3" opacity="0.28"/>
+        <line x1="40" y1="20" x2="40" y2="60" stroke="#15803D" strokeWidth="1.3" opacity="0.22"/>
+        <text x="22" y="30" fontSize="8" fontFamily="'DM Mono',monospace" fill="#15803D" opacity="0.4">CASH</text>
+        <text x="44" y="30" fontSize="8" fontFamily="'DM Mono',monospace" fill="#15803D" opacity="0.4">BANK</text>
+        <text x="20" y="50" fontSize="10" fontFamily="'DM Mono',monospace" fill="#15803D" opacity="0.5" fontWeight="600">12,400</text>
+        <text x="43" y="50" fontSize="10" fontFamily="'DM Mono',monospace" fill="#15803D" opacity="0.5" fontWeight="600">8,200</text>
+      </svg>
+    ),
+    rotate: 9,
+    tx: 114,
+    ty: 12,
+    zIndex: 5,
+  },
+  {
+    id: 6,
+    title: 'Lost paper bills',
+    tagline: 'SNAP AND ATTACH RECEIPTS IN SECONDS',
+    solution: 'No more hunting for crumpled paper. Snap a photo of any receipt and attach it to your entry instantly.',
+    gradient: 'linear-gradient(145deg, #FFFBEB 0%, #F7F6F0 50%, #EDF7F2 100%)',
+    accent: '#166534',
+    icon: (
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="20" y="18" width="40" height="44" rx="6" stroke="#15803D" strokeWidth="1.5" fill="none" opacity="0.18"/>
+        <circle cx="40" cy="36" r="9" stroke="#15803D" strokeWidth="1.3" fill="none" opacity="0.25"/>
+        <circle cx="40" cy="36" r="4" fill="#EAF5EE" stroke="#15803D" strokeWidth="1.2" opacity="0.45"/>
+        <path d="M28 23h6l2-4h8l2 4h6" stroke="#15803D" strokeWidth="1.3" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.3"/>
+        <line x1="26" y1="52" x2="40" y2="52" stroke="#15803D" strokeWidth="1.3" strokeLinecap="round" opacity="0.3"/>
+        <line x1="26" y1="57" x2="36" y2="57" stroke="#15803D" strokeWidth="1.3" strokeLinecap="round" opacity="0.3"/>
+      </svg>
+    ),
+    rotate: 15,
+    tx: 190,
+    ty: 28,
+    zIndex: 6,
+  },
+];
+
+function FannedCardDeck() {
+  const [hoveredId, setHoveredId] = useState(null);
+  const [activeId, setActiveId] = useState(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const handleCardMouseMove = (e, cardId) => {
+    if (!hoveredId) return;
+    const card = document.getElementById(`fdc-card-${cardId}`);
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    setMousePos({
+      x: ((e.clientX - rect.left) / rect.width - 0.5) * 2,
+      y: ((e.clientY - rect.top) / rect.height - 0.5) * 2,
+    });
+  };
+
+  const activeCard = PAIN_CARDS.find(c => c.id === activeId);
+
+  return (
+    <section className="fdc-section reveal">
+      {/* Ambient glow */}
+      <div className="fdc-glow" aria-hidden="true" />
+
+      {/* Two-column split layout */}
+      <div className="fdc-inner">
+        {/* LEFT: Card deck */}
+        <div className="fdc-col-deck">
+          <div
+            className="fdc-stage"
+            aria-label="Interactive card deck showing business pain points"
+          >
+            {PAIN_CARDS.map((card) => {
+              const isHovered = hoveredId === card.id;
+              const isActive = activeId === card.id;
+
+              // Static arc values + smooth hover lift & pop-to-front
+              const hoverTy = isHovered ? -10 : 0;
+              const hoverRotateReduce = isHovered ? card.rotate * 0.15 : 0;
+              const hoverScale = isHovered ? 1.025 : 1;
+
+              // 3D tilt from mouse pos (only on hovered card)
+              const tiltX = isHovered ? mousePos.y * -6 : 0;
+              const tiltY = isHovered ? mousePos.x * 8 : 0;
+
+              const finalRotate = card.rotate - hoverRotateReduce;
+              const finalTy = card.ty + hoverTy;
+              const finalTx = card.tx;
+
+              const zIndex = isHovered || isActive ? 50 : card.zIndex;
+
+              return (
+                <div
+                  key={card.id}
+                  id={`fdc-card-${card.id}`}
+                  className={`fdc-card${isHovered ? ' fdc-card--hovered' : ''}`}
+                  style={{
+                    background: card.gradient,
+                    transform: `translateX(${finalTx}px) translateY(${finalTy}px) rotate(${finalRotate}deg) scale(${hoverScale}) perspective(900px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`,
+                    zIndex,
+                    transition: 'transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.25s ease',
+                  }}
+                  onMouseEnter={() => setHoveredId(card.id)}
+                  onMouseLeave={() => { setHoveredId(null); setMousePos({ x: 0, y: 0 }); }}
+                  onMouseMove={(e) => handleCardMouseMove(e, card.id)}
+                  onClick={() => setActiveId(card.id)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${card.title}: ${card.tagline}`}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setActiveId(card.id); }}
+                >
+                  {/* Sheen overlay */}
+                  {isHovered && (
+                    <div
+                      className="fdc-sheen"
+                      style={{
+                        background: `radial-gradient(circle at ${(mousePos.x + 1) * 50}% ${(mousePos.y + 1) * 50}%, rgba(255,255,255,0.45) 0%, transparent 65%)`,
+                      }}
+                      aria-hidden="true"
+                    />
+                  )}
+
+                  {/* Card number */}
+                  <span className="fdc-card-num">0{card.id}</span>
+
+                  {/* Card title */}
+                  <h3 className="fdc-card-title">{card.title}</h3>
+
+                  {/* Icon watermark */}
+                  <div className="fdc-card-icon" aria-hidden="true">
+                    {card.icon}
+                  </div>
+
+                  {/* Tagline */}
+                  <p className="fdc-card-tagline">{card.tagline}</p>
+
+                  {/* Watermark */}
+                  <span className="fdc-watermark">easykanaku.</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>{/* /fdc-col-deck */}
+
+        {/* RIGHT: Text content */}
+        <div className="fdc-col-text">
+          <span className="fdc-eyebrow">THE EVERYDAY STRUGGLE</span>
+          <h2 className="fdc-headline">Running a business<br />is hard enough.</h2>
+          <p className="fdc-subtitle">Your accounts shouldn't be another job at the end of the day.</p>
+        </div>
+      </div>{/* /fdc-inner */}
+
+      {/* Detail modal overlay */}
+      <AnimatePresence>
+        {activeCard && (
+          <motion.div
+            className="fdc-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            onClick={() => setActiveId(null)}
+            aria-modal="true"
+            role="dialog"
+            aria-label={`${activeCard.title} detail`}
+          >
+            <motion.div
+              className="fdc-detail"
+              style={{ background: activeCard.gradient }}
+              initial={{ scale: 0.88, opacity: 0, y: 32 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 24 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className="fdc-detail-close"
+                onClick={() => setActiveId(null)}
+                aria-label="Close"
+              >×</button>
+              <span className="fdc-eyebrow" style={{ marginBottom: 8 }}>THE EVERYDAY STRUGGLE</span>
+              <h3 className="fdc-detail-title">{activeCard.title}</h3>
+              <div className="fdc-detail-icon">{activeCard.icon}</div>
+              <p className="fdc-card-tagline" style={{ marginBottom: 12, color: activeCard.accent }}>{activeCard.tagline}</p>
+              <p className="fdc-detail-solution">{activeCard.solution}</p>
+              <span className="fdc-watermark" style={{ position: 'static', marginTop: 20, opacity: 0.35 }}>easykanaku.</span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+}
+
 function App() {
   const [transactions, setTransactions] = useState(seedTransactions);
   const [activeType, setActiveType] = useState('all');
@@ -1406,6 +1982,11 @@ function App() {
   const [activeNav, setActiveNav] = useState('how');
   const [heroRevealed, setHeroRevealed] = useState(false);
   const [preloaderDone, setPreloaderDone] = useState(false);
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
+  const handleOpenDemoModal = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    setDemoModalOpen(true);
+  };
   const [activeFeatureId, setActiveFeatureId] = useState('01');
   const [scoopLeft, setScoopLeft] = useState(0);
   const [scoopReady, setScoopReady] = useState(false);
@@ -1478,7 +2059,14 @@ function App() {
   }, []);
 
   const handleNavClick = (id, e) => {
-    if (e) e.preventDefault();
+    if (e) {
+      if (e.preventDefault) e.preventDefault();
+      if (e.stopPropagation) e.stopPropagation();
+    }
+    if (id === 'demo') {
+      setDemoModalOpen(true);
+      return;
+    }
     setActiveNav(id);
     isClickingRef.current = true;
     if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
@@ -1628,7 +2216,23 @@ function App() {
 
   return <div className="app-shell">
     <HeroIntroPreloader onStartReveal={() => setHeroRevealed(true)} onComplete={() => setPreloaderDone(true)} />
-    <div className="announcement"><span className="live-dot"></span> A simpler way to keep your business moving <span className="announce-tag">Meet the interactive demo <ArrowRight size={13} /></span></div>
+    <div className="announcement">
+      <span className="live-dot"></span> A simpler way to keep your business moving{' '}
+      <button
+        type="button"
+        className="announce-tag"
+        onClick={(e) => {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          setDemoModalOpen(true);
+        }}
+        style={{ cursor: 'pointer', background: 'transparent', border: 'none', padding: 0, font: 'inherit' }}
+      >
+        Meet the interactive demo <ArrowRight size={13} />
+      </button>
+    </div>
     <header className="nav-wrap">
       <a className="brand" href="#top" aria-label="Easy Kanaku home"><span className="brand-mark"><AudioLines size={20} /></span><span>easy<span className="brand-kanaku">kanaku</span><i>.</i></span></a>
       <nav className="nav-links">
@@ -1639,19 +2243,61 @@ function App() {
           { id: 'demo', label: 'Try the demo', href: '#demo' },
           { id: 'faq', label: 'FAQ', href: '#faq' }
         ].map(item => (
-          <a
-            key={item.id}
-            ref={el => { linkRefs.current[item.id] = el; }}
-            href={item.href}
-            className={activeNav === item.id ? 'active' : ''}
-            onClick={(e) => handleNavClick(item.id, e)}
-          >
-            {item.label}
-          </a>
+          item.id === 'demo' ? (
+            <button
+              key={item.id}
+              ref={el => { linkRefs.current[item.id] = el; }}
+              type="button"
+              className={`bg-transparent border-0 shadow-none appearance-none ${activeNav === item.id ? 'active' : ''}`.trim()}
+              onClick={(e) => {
+                if (e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+                setDemoModalOpen(true);
+              }}
+            >
+              {item.label}
+            </button>
+          ) : (
+            <a
+              key={item.id}
+              ref={el => { linkRefs.current[item.id] = el; }}
+              href={item.href}
+              className={activeNav === item.id ? 'active' : ''}
+              onClick={(e) => handleNavClick(item.id, e)}
+            >
+              {item.label}
+            </a>
+          )
         ))}
       </nav>
-      <a className="nav-cta" href="#demo">Try it now <ArrowRight size={15} /></a>
-      <a className="mobile-try" href="#demo">Try demo</a>
+      <div className="nav-actions">
+        <a
+          href="https://play.google.com/store/apps/details?id=com.reflexlabs.easykanakku"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nav-store-btn nav-store-play"
+          aria-label="Download Easy Kanaku on Google Play"
+        >
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
+            <path d="M3.609 1.814L13.793 12 3.61 22.186c-.347-.365-.549-.876-.549-1.45V3.264c0-.574.202-1.085.548-1.45zm11.242 11.243l2.091 2.091-11.834 6.84 9.743-8.931zm0-2.114L5.108 1.996l11.834 6.84-2.091 2.091zm1.472 1.057l3.664 2.118c.954.551.954 1.455 0 2.006l-3.664 2.118-2.355-2.355 2.355-1.887z"/>
+          </svg>
+          <span>Google Play</span>
+        </a>
+        <a
+          href="https://apps.apple.com/in/app/easy-kanaku/id6815802230"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nav-store-btn nav-store-apple"
+          aria-label="Download Easy Kanaku on the App Store"
+        >
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83zM15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.63 1.35-.57.65-1.06 1.73-.93 2.76 1.01.08 2.02-.51 2.64-1.26z"/>
+          </svg>
+          <span>App Store</span>
+        </a>
+      </div>
     </header>
 
     <main id="top">
@@ -1746,9 +2392,21 @@ function App() {
             animate={heroRevealed ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.65, delay: 0.70, ease: [0.16, 1, 0.3, 1] }}
           >
-            <a className="btn-primary" href="#demo">Try the live demo <ArrowRight size={17} /></a>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={(e) => {
+                if (e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+                setDemoModalOpen(true);
+              }}
+            >
+              Try the live demo <ArrowRight size={17} />
+            </button>
             <a className="btn-quiet" href="#how"><span className="play-icon">▶</span> See how it works</a>
-          </motion.div>
+            </motion.div>
 
           <motion.div
             className="hero-proof"
@@ -1756,7 +2414,20 @@ function App() {
             animate={heroRevealed ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.65, delay: 0.78, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="avatar-stack"><span>P</span><span>R</span><span>S</span></div>
+            <div className="avatar-stack flex items-center -space-x-2.5">
+              <div className="avatar-item w-8 h-8 rounded-full overflow-hidden ring-2 ring-[#F7F6F0] shadow-xs relative z-0" style={{ zIndex: 0 }}>
+                <img src="/images/avatar-lion.png" alt="Lion avatar" className="avatar-img w-full h-full object-cover" />
+              </div>
+              <div className="avatar-item w-8 h-8 rounded-full overflow-hidden ring-2 ring-[#F7F6F0] shadow-xs relative z-10" style={{ zIndex: 10 }}>
+                <img src="/images/avatar-giraffe.png" alt="Giraffe avatar" className="avatar-img w-full h-full object-cover" />
+              </div>
+              <div className="avatar-item w-8 h-8 rounded-full overflow-hidden ring-2 ring-[#F7F6F0] shadow-xs relative z-20" style={{ zIndex: 20 }}>
+                <img src="/images/avatar-fox.png" alt="Fox avatar" className="avatar-img w-full h-full object-cover" />
+              </div>
+              <div className="avatar-item w-8 h-8 rounded-full overflow-hidden ring-2 ring-[#F7F6F0] shadow-xs relative z-30" style={{ zIndex: 30 }}>
+                <img src="/images/avatar-rabbit.png" alt="White Rabbit avatar" className="avatar-img w-full h-full object-cover" />
+              </div>
+            </div>
             <span>Made for everyday business</span>
             <span className="proof-divider"></span>
             <span className="proof-stars">★★★★★</span>
@@ -1786,13 +2457,14 @@ function App() {
             <span className="float-check"><Check size={13} /></span>
           </motion.div>
 
-          <div className="phone">
-            <div className="phone-top"><span>9:41</span><span className="phone-speaker"></span><span>◉ ◈</span></div>
-            <div className="phone-head"><div><small>GOOD MORNING</small><h3>Your business</h3></div><div className="profile-dot">P</div></div>
-            <div className="balance-card"><div className="balance-label"><Wallet size={14} /> TODAY'S OVERVIEW</div><div className="balance-number">₹12,840</div><div className="balance-foot"><span><i className="mini-dot"></i> Cash balance</span><span className="balance-change">↑ 12.8%</span></div><div className="mini-bars">{[28, 42, 34, 58, 44, 72, 52, 84, 62, 75, 55, 92].map((h, i) => <span key={i} style={{ height: h + '%' }} />)}</div></div>
-            <div className="phone-section-title">Recent activity <span>View all →</span></div>
-            {[['↙', 'Ravi paid you', 'Today · 10:18 AM', '+₹2,400', 'positive'], ['↗', 'Stock purchase', 'Today · 09:42 AM', '−₹1,620', 'negative'], ['◷', 'Lakshmi · Udhār', 'Yesterday', '₹850 due', 'credit']].map((x, i) => <div className="phone-transaction" key={i}><span className={'transaction-icon ' + x[4]}>{x[0]}</span><div className="transaction-text"><b>{x[1]}</b><small>{x[2]}</small></div><strong className={x[4]}>{x[3]}</strong></div>)}
-            <div className="phone-mic"><Mic size={19} /><span>Tap to speak a transaction</span><span className="mic-wave"><i /><i /><i /><i /><i /></span></div>
+          <div className="phone hero-phone-container">
+            <div className="phone-screen-viewport">
+              <img
+                src="/images/HomeDefault_reference.png"
+                alt="Easy Kanaku Mobile App Dashboard"
+                className="phone-screen-img"
+              />
+            </div>
           </div>
 
           <motion.div
@@ -1805,38 +2477,76 @@ function App() {
             <div><strong>Entry saved</strong><small>Just like that.</small></div>
           </motion.div>
 
-          <div className="hero-note"><Sparkles size={14} /> Less typing. More doing.</div>
+          <div className="hero-note" style={{ marginTop: "36px" }}><Sparkles size={14} /> Less typing. More doing.</div>
         </motion.div>
 
         <div className="hero-bottom"><span>MADE FOR BUSINESSES THAT NEVER STAND STILL</span><div><span>Retail</span><span>Food &amp; beverage</span><span>Services</span><span>Small businesses</span></div></div>
       </section>
 
-      <section className="problem section-pad reveal">
-        <div className="section-kicker">THE EVERYDAY STRUGGLE</div><div className="problem-grid"><h2>Running a business<br />is hard enough.</h2><div><p className="section-lead">Your accounts shouldn't be another job at the end of the day.</p><p className="muted">Too much typing, complicated screens, and language barriers turn simple bookkeeping into a chore. Easy Kanaku makes the everyday feel easy again.</p></div></div>
-        <div className="pain-row"><div className="pain-item"><span className="pain-icon"><FileText size={19} /></span><div><b>Too much typing</b><p>Every small sale shouldn't mean a long form.</p></div><span className="pain-number">01</span></div><div className="pain-item"><span className="pain-icon"><BarChart3 size={19} /></span><div><b>Complicated entries</b><p>Keep your books clear without the jargon.</p></div><span className="pain-number">02</span></div><div className="pain-item"><span className="pain-icon"><Globe2 size={19} /></span><div><b>Language barriers</b><p>Speak in the language that feels natural.</p></div><span className="pain-number">03</span></div></div>
-      </section>
+      <FannedCardDeck />
 
       <HeroSection />
 
       <InteractiveHoverFeatures />
 
 
-      <section id="languages" className="language-section reveal"><div className="language-inner"><div className="section-kicker">YOUR LANGUAGE. YOUR BUSINESS.</div><h2>Business has its own language.<br /><em>Use yours.</em></h2><p>Choose a language and hear a sample phrase. The live demo will use your selection where your browser supports speech recognition.</p><div className="language-picker">{Object.keys(languageSamples).map((lang, i) => <button key={lang} className={language === lang ? 'language-chip selected' : 'language-chip'} onClick={() => { setLanguage(lang); setToast(`${lang} selected`); }}><span className="lang-num">0{i + 1}</span><b>{lang}</b><span className="lang-check">{language === lang ? <Check size={15} /> : <AudioLines size={15} />}</span></button>)}</div><div className="language-sample"><span className="sample-label"><AudioLines size={16} /> SAMPLE PHRASE</span><p>{languageSamples[language]}</p><button onClick={() => useSample(languageSamples[language])}>Try this phrase <ArrowRight size={15} /></button></div><div className="language-foot"><span>English</span><span>తెలుగు</span><span>தமிழ்</span><span>हिन्दी</span><span>ಕನ್ನಡ</span></div></div><div className="language-decoration"><div className="lang-orb orb-a"></div><div className="lang-orb orb-b"></div><div className="lang-sticker"><AudioLines size={26} /><span>Say it.<br />Save it.</span></div></div></section>
+      <section id="languages" className="language-section reveal"><div className="language-inner"><div className="section-kicker">YOUR LANGUAGE. YOUR BUSINESS.</div><h2>Business has its own language.<br /><em>Use yours.</em></h2><p>Choose a language and hear a sample phrase. The live demo will use your selection where your browser supports speech recognition.</p><div className="language-picker">{Object.keys(languageSamples).map((lang, i) => <button key={lang} className={language === lang ? 'language-chip selected' : 'language-chip'} onClick={() => { setLanguage(lang); setToast(`${lang} selected`); }}><span className="lang-num">0{i + 1}</span><b>{lang}</b><span className="lang-check">{language === lang ? <Check size={15} /> : <AudioLines size={15} />}</span></button>)}</div><div className="language-sample"><span className="sample-label"><AudioLines size={16} /> SAMPLE PHRASE</span><p>{languageSamples[language]}</p><button
+            type="button"
+            onClick={(e) => {
+              if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+              setDemoModalOpen(true);
+            }}
+          >
+            Try this phrase <ArrowRight size={15} />
+          </button></div><div className="language-foot"><span>English</span><span>తెలుగు</span><span>தமிழ்</span><span>हिन्दी</span><span>ಕನ್ನಡ</span></div></div><div className="language-decoration"><div className="lang-orb orb-a"></div><div className="lang-orb orb-b"></div><div className="lang-sticker"><AudioLines size={26} /><span>Say it.<br />Save it.</span></div></div></section>
 
       <CardStack3DSection />
 
       <section className="preview-section section-pad reveal"><div className="section-heading"><div><div className="section-kicker">ONE PRODUCT. DIFFERENT VIEWS.</div><h2>Find the view that<br /><em>works for you.</em></h2></div><p className="muted">Tap through the preview. This is what a calmer<br />business day could look like.</p></div>
-        <div className="preview-tabs">{['Dashboard', 'Voice Entry', 'Udhār Ledger', 'Reports'].map(t => <button key={t} className={activePreview === t ? 'selected' : ''} onClick={() => setActivePreview(t)}>{t}</button>)}</div>
-        <div className="preview-window"><div className="preview-sidebar"><div className="mini-brand"><span className="brand-mark"><AudioLines size={16} /></span><b>easykanaku</b></div><div className="sidebar-links">{[['Dashboard', '▦'], ['Voice Entry', '◖'], ['Udhār Ledger', '◷'], ['Reports', '⌁']].map(([t, ic]) => <button key={t} className={activePreview === t ? 'active' : ''} onClick={() => setActivePreview(t)}><span>{ic}</span>{t}</button>)}</div><div className="sidebar-user"><span className="profile-dot">P</span><div><b>Priya's Store</b><small>Demo workspace</small></div></div></div>
-          <div className="preview-content"><div className="preview-toolbar"><div><small>YOUR BUSINESS / OVERVIEW</small><h3>{activePreview === 'Dashboard' ? 'Good morning, Priya 👋' : activePreview === 'Voice Entry' ? 'Voice entry' : activePreview === 'Udhār Ledger' ? 'Customer credit' : 'Business reports'}</h3></div><span className="preview-date">Today, 30 Oct <ChevronDown size={13} /></span></div>
-            {activePreview === 'Dashboard' && <><div className="preview-stat-grid"><div><small>Total income</small><strong>₹24,800</strong><span>↗ 12.8% this week</span></div><div><small>Total expenses</small><strong>₹8,240</strong><span>↘ 4.2% this week</span></div><div><small>Outstanding credit</small><strong>₹3,450</strong><span>3 customers</span></div></div><div className="preview-chart-card"><div><b>Cash flow</b><small>Income vs expenses · this week</small></div><div className="big-chart">{[48, 67, 42, 76, 55, 84, 62, 92, 70, 61, 80, 52, 72, 90, 65, 78, 48, 82].map((h, i) => <span key={i} style={{ height: h + '%' }} />)}</div><div className="chart-legend"><span><i className="green-dot"></i> Income</span><span><i className="yellow-dot"></i> Expenses</span></div></div></>}
-            {activePreview === 'Voice Entry' && <div className="preview-interactive"><div className="preview-mic"><Mic size={25} /></div><h4>Say what happened.</h4><p>“Received 1,500 rupees from Meena”</p><button onClick={() => { useSample('Received 1,500 rupees from Meena'); if (window.__lenis) { window.__lenis.scrollTo('#demo', { offset: -90, duration: 1.2 }); } else { document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' }); } }}>Try this in the live demo <ArrowRight size={14} /></button></div>}
-            {activePreview === 'Udhār Ledger' && <div className="preview-table"><div className="table-row table-head"><span>Customer</span><span>Due date</span><span>Amount</span><span>Status</span></div>{[['Lakshmi Stores', '06 Nov', '₹850', 'Upcoming'], ['Ramesh Kumar', '31 Oct', '₹1,200', 'Due soon'], ['Meena Traders', '10 Nov', '₹1,400', 'Upcoming']].map(r => <div className="table-row" key={r[0]}>{r.map((v, i) => <span key={i} className={i === 3 ? 'status-cell' : ''}>{v}</span>)}</div>)}</div>}
-            {activePreview === 'Reports' && <div className="report-preview"><div className="report-total"><small>Net movement (sample)</small><strong>₹16,560</strong><span>Income minus expenses</span></div><div className="report-donut"><div><b>76%</b><small>income</small></div></div><div className="report-key"><span><i className="green-dot"></i> Income <b>₹24,800</b></span><span><i className="yellow-dot"></i> Expenses <b>₹8,240</b></span></div></div>}
-          </div></div><p className="preview-caption"><span className="live-dot"></span> Interactive product concept · Sample figures shown</p>
+        <div className="preview-tabs" style={{justifyContent: 'center'}}>
+          {['Dashboard', 'Voice Entry', 'Credit Ledger', 'Reports'].map(t =>
+            <button key={t} className={activePreview === t ? 'selected' : ''} onClick={() => setActivePreview(t)}>{t}</button>
+          )}
+        </div>
+        <div className="preview-phone-wrap">
+          <div className="preview-phone-frame">
+            <div className="preview-phone-top"><span className="preview-phone-time">9:41</span><span className="preview-phone-speaker"></span><span className="preview-phone-icons">● ◈</span></div>
+            <div className="preview-phone-screen">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activePreview}
+                  src={previewTabsData[activePreview]?.img || '/images/HomeDefault_reference.png'}
+                  alt={previewTabsData[activePreview]?.alt || 'Easy Kanaku Preview'}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.28, ease: "easeInOut" }}
+                  className={`preview-phone-img ${activePreview === 'Voice Entry' ? 'align-bottom' : ''}`}
+                />
+              </AnimatePresence>
+              <div className={activePreview === 'Voice Entry' ? 'preview-phone-fade-top' : 'preview-phone-fade-bottom'} />
+            </div>
+          </div>
+        </div>
+        <p className="preview-caption"><span className="live-dot"></span> Interactive product concept · Sample figures shown</p>
       </section>
 
-      <section id="faq" className="faq-section section-pad reveal"><div className="faq-intro"><div className="section-kicker">GOOD QUESTIONS</div><h2>A few things<br />you might be <em>wondering.</em></h2><p className="muted">Still curious? Here's the short version.</p><a href="#demo" className="faq-link">Try the interactive demo <ArrowRight size={15} /></a></div><div className="faq-list">{[
+      <section id="faq" className="faq-section section-pad reveal"><div className="faq-intro"><div className="section-kicker">GOOD QUESTIONS</div><h2>A few things<br />you might be <em>wondering.</em></h2><p className="muted">Still curious? Here's the short version.</p><button
+            type="button"
+            className="faq-link"
+            onClick={(e) => {
+              if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+              setDemoModalOpen(true);
+            }}
+          >
+            Try the interactive demo <ArrowRight size={15} />
+          </button></div><div className="faq-list">{[
         ['What is Easy Kanaku?', 'Easy Kanaku is presented here as a voice-first bookkeeping concept for small businesses. This website is an interactive product demo, not a live account.'],
         ['Can I try the voice feature?', 'Yes. Use Chrome or another browser that supports the Web Speech API, allow microphone access, and speak a short transaction. You can also tap sample phrases or edit the transcript manually.'],
         ['Which languages can I explore?', 'The concept includes English, Telugu, Tamil, Hindi and Kannada. Actual speech recognition depends on your browser and the language support available on your device.'],
@@ -1845,7 +2555,11 @@ function App() {
       ].map(([q, a], i) => <div className={faqOpen === i ? 'faq-item open' : 'faq-item'} key={q}><button onClick={() => setFaqOpen(faqOpen === i ? -1 : i)} aria-expanded={faqOpen === i}><span className="faq-index">0{i + 1}</span><b>{q}</b><span className="faq-toggle">{faqOpen === i ? <X size={16} /> : <Plus size={16} />}</span></button>{faqOpen === i && <p>{a}</p>}</div>)}</div></section>
 
       </main>
-    <FooterMorphSection />
+    <FooterMorphSection onOpenDemo={handleOpenDemoModal} />
+    <DemoComingSoonModal
+      isOpen={demoModalOpen}
+      onClose={() => setDemoModalOpen(false)}
+    />
     {toast && <div className="toast"><Check size={16} />{toast}</div>}
   </div>;
 }

@@ -172,6 +172,50 @@
   border-radius: 16px;
 }
 
+.cs-card-visual.cs-card-visual-device {
+  padding: 16px 16px 0 16px;
+  background: linear-gradient(135deg, #EAF5EE 0%, #F7F6F0 50%, #E6F2EB 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 190px;
+}
+
+.cs-device-frame {
+  width: 68%;
+  max-width: 210px;
+  height: 174px;
+  position: relative;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: none;
+  box-shadow: 0 10px 20px -4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.cs-device-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  object-position: top;
+}
+
+.cs-device-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: linear-gradient(to top, rgba(247, 246, 240, 0.95) 0%, rgba(247, 246, 240, 0.5) 50%, transparent 100%);
+  pointer-events: none;
+}
+
 /* Micro-UI: Clear Entries */
 .cs-entry-pill {
   display: flex;
